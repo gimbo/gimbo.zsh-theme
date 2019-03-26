@@ -360,6 +360,13 @@ fi
 
   # Config for final/prompt line
   #
-  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
+  local vi_insert='$'
+  if (( ${PURE_POWER_USE_P10K_EXTENSIONS:-1} )); then
+    local p="\${\${\${KEYMAP:-0}:#vicmd}:+${${vi_insert//\\/\\\\}//\}/\\\}}}"
+    p+="\${\${\$((!\${#\${KEYMAP:-0}:#vicmd})):#0}:+${${vi_cmd//\\/\\\\}//\}/\\\}}}"
+  else
+    p=$vi_insert
+  fi
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%(?.%F{002}${p}%f.%F{009}${p}%f) "
 
 } "$@"
