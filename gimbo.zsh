@@ -261,30 +261,49 @@ fi
   # GIMBO
 
   # TODO:
-  # * Only display second line at all if vcs is active
-  # * Don't duplicate call to git rev-parse (see comment below)
   # * Remove space between vcs_root and vcs; vcs_joined seems to fail
   #   Github issue: https://github.com/romkatv/powerlevel10k/issues/41
   # * Prefix $ on final line with hostname
 
-  function vcs_root() {
+  function get_vcs_root() {
+      # Could maybe speed this up (particularly as it's called twice)
+      # by using the gitstatus daemon thing like the vcs element
+      # does. It's probably not worth the bother though.
+      #
+      # If interested, see: https://github.com/romkatv/gitstatus
+      local root
       local x=$(git rev-parse --show-toplevel 2> /dev/null)
       if [[ -n $x ]]; then
-          local root=$(basename $x)
+          root=$(basename $x)
+          echo "$root"
+      fi
+  }
+
+  function maybe_newline() {
+      if [[ -n "$VIRTUAL_ENV" || -n $(get_vcs_root) ]]; then
+          # The extra characters seems needed here - a plain newline
+          # gets stripped for some reason. Got these codes, which seem
+          # to move the cursor forwards and back, from
+          # https://github.com/bhilburn/powerlevel9k/issues/169#issuecomment-167771019
+          echo "\n│\e[1C\e[1D"
+      fi
+  }
+  typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE="maybe_newline"
+
+  function vcs_root() {
+      local root=$(get_vcs_root)
+      if [[ -n $root ]]; then
           echo "$root"
       fi
   }
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT="vcs_root"
 
-  # I don't love the duplication of the git-rev-parse call here, but
-  # I don't (yet) know of any way to include this text in the vcs_root
-  # output but in a different colour...  You could remove the duplication
-  # by using the gitstatus daemon thing like the vcs element does.
-  # See: https://github.com/romkatv/gitstatus
-  #
+  # This is a slightly hacky way to ensure this character is not
+  # coloured the same as the repo name; there _may_ be a nicer way to
+  # do this but I bet not.
   function vcs_root_tail() {
-      local x=$(git rev-parse --show-toplevel 2> /dev/null)
-      if [[ -n $x ]]; then
+      local root=$(get_vcs_root)
+      if [[ -n $root ]]; then
           echo -n "±"
       fi
   }
@@ -304,7 +323,7 @@ fi
       dir_writable dir
       status
       pyenv
-      newline
+      custom_maybe_newline
       virtualenv
       custom_vcs_root custom_vcs_root_tail_joined vcs
   )
@@ -319,6 +338,8 @@ fi
   typeset -g POWERLEVEL9K_PYENV_FOREGROUND=005
 
   # Second line
+  typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE_BACKGROUND=none
+  typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE_FOREGROUND=none
   typeset -g POWERLEVEL9K_VIRTUALENV_BACKGROUND=none
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=none
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_BACKGROUND=008
