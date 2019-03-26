@@ -293,21 +293,10 @@ fi
   function vcs_root() {
       local root=$(get_vcs_root)
       if [[ -n $root ]]; then
-          echo "$root"
+          echo "$root±"
       fi
   }
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT="vcs_root"
-
-  # This is a slightly hacky way to ensure this character is not
-  # coloured the same as the repo name; there _may_ be a nicer way to
-  # do this but I bet not.
-  function vcs_root_tail() {
-      local root=$(get_vcs_root)
-      if [[ -n $root ]]; then
-          echo -n "±"
-      fi
-  }
-  typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_TAIL="vcs_root_tail"
 
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=' '
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '
@@ -325,7 +314,7 @@ fi
       pyenv
       custom_maybe_newline
       virtualenv
-      custom_vcs_root custom_vcs_root_tail_joined vcs
+      custom_vcs_root vcs
   )
 
   # First line
@@ -348,8 +337,6 @@ fi
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=015
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_BACKGROUND=008
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_FOREGROUND=245
-  typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_TAIL_BACKGROUND=none
-  typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_TAIL_FOREGROUND=none
   # typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=156
   # typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=195
   # typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=001
