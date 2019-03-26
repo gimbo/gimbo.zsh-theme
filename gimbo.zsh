@@ -1,9 +1,10 @@
-# ------------------------------------------------------------------------
-# Andy Gimblett's zsh prompt
+# Andy Gimblett's zsh prompt/theme.
 #
-# This is a modification/extension of purepower
+# This is a modification/extension of purepower - see below.
 #
-# See the "GIMBO" section for customisations; these rest of this should be default purepower
+# See the "GIMBO" section for customisations; the rest of this file
+# (other than this header) should just be the default purepower
+# config.
 
 
 
@@ -261,9 +262,15 @@ fi
   # GIMBO
 
   # TODO:
-  # * Remove space between vcs_root and vcs; vcs_joined seems to fail
-  #   Github issue: https://github.com/romkatv/powerlevel10k/issues/41
-  # * Prefix $ on final line with hostname
+  #
+  # * Remove space between vcs_root and vcs; specifying a segment
+  #   called vcs_joined should apparently work but seems to fail - for
+  #   which I've opened a github issue:
+  #   https://github.com/romkatv/powerlevel10k/issues/41
+
+
+
+  # Helpers
 
   function get_vcs_root() {
       # Could maybe speed this up (particularly as it's called twice)
@@ -279,6 +286,12 @@ fi
       fi
   }
 
+  # Custom prompt segments
+
+  # We don't want to display the second line if there's nothing to
+  # display there (i.e. no virtualenv and no git); this custom segment
+  # gives us that.
+  #
   function maybe_newline() {
       if [[ -n "$VIRTUAL_ENV" || -n $(get_vcs_root) ]]; then
           # The extra characters seems needed here - a plain newline
@@ -290,6 +303,9 @@ fi
   }
   typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE="maybe_newline"
 
+  # Display the git root directory, i.e. the name of the directory
+  # (this or an ancestor) containing the .git folder.
+  #
   function vcs_root() {
       local root=$(get_vcs_root)
       if [[ -n $root ]]; then
@@ -298,13 +314,11 @@ fi
   }
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT="vcs_root"
 
+  # General config
+  #
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=' '
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '
-
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="╭─"
-  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX="│ "
-
   typeset -ga POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       history
       time
@@ -316,8 +330,12 @@ fi
       virtualenv
       custom_vcs_root vcs
   )
+  typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+      command_execution_time root_indicator background_jobs)
 
-  # First line
+  # Config for first line elements
+  #
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="╭─"
   typeset -g POWERLEVEL9K_HISTORY_BACKGROUND=none
   typeset -g POWERLEVEL9K_HISTORY_FOREGROUND=none
   typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
@@ -330,27 +348,18 @@ fi
   typeset -g POWERLEVEL9K_PYENV_BACKGROUND=none
   typeset -g POWERLEVEL9K_PYENV_FOREGROUND=005
 
-  # Second line
+  # Config for second line elements
+  #
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX="│ "
   typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE_BACKGROUND=none
   typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE_FOREGROUND=none
   typeset -g POWERLEVEL9K_VIRTUALENV_BACKGROUND=none
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=015
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_BACKGROUND=008
   typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_FOREGROUND=245
-  # typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=156
-  # typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=195
-  # typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=001
-  # typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=none
-  # typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=none
-  # typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=none
 
-  # Unlike in gimbo.zsh-theme, no hostname on this line any more
+  # Config for final/prompt line
+  #
   typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
-
-  # Right hand side
-  typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
-      command_execution_time root_indicator background_jobs)
-
-
 
 } "$@"
