@@ -1,92 +1,356 @@
 # ------------------------------------------------------------------------
-# Andy Gimblett's zsh theme
-# Incorporating bits and bobs from various other themes:
-#   bira - curvaceous lines
-#   dstufft - virtualenv goodness
-#   robbyrussell - git goodness
-#   skaro - history line number
-#   duellj - clock
-# ------------------------------------------------------------------------
+# Andy Gimblett's zsh prompt
+#
+# This is a modification/extension of purepower
+#
+# See the "GIMBO" section for customisations; these rest of this should be default purepower
 
-local clr_history=$fg[lightgrey]
-local clr_time=$reset_color
-local clr_host=$fg[red]
-local clr_user=$fg[green]
-local clr_path=$fg[white]
-local clr_venv=$fg[cyan]
-local clr_git_bg=$fg[lightgrey]
-local clr_git_toplevel=$fg[green]
-local clr_git_branch=$fg[yellow]
-local clr_git_dirty=$fg_bold[yellow]
-local clr_prompt=$reset_color
-local clr_compact_host=$fg[lightgrey]
 
-local history_line='%{$clr_history%}%h%{$reset_color%}'
-local time='%{$clr_time%}%*%{$reset_color%}'
-local user_host='%{$clr_user%}%n@%m%{$reset_color%}'
-local current_dir='%{$clr_path%}${PWD/#$HOME/~}%{$reset_color%}'
-local return_code="%(?..%{$fg[red]%}↵ %?%{$reset_color%})"
 
-function virtualenv_info {
-    # [ $VIRTUAL_ENV ] && echo '«'`basename $VIRTUAL_ENV`'» '
-    [ $VIRTUAL_ENV ] && echo `basename $VIRTUAL_ENV`' '
-}
+# Original location: https://github.com/romkatv/dotfiles-public/blob/master/.purepower.
+# If you copy this file, keep the link to the original and this sentence intact; you are encouraged
+# to change everything else.
+#
+# This file defines configuration options for Powerlevel10k ZSH theme that will make your prompt
+# lightweight and sleek, unlike the default bulky look. You can also use it with Powerlevel9k -- a
+# great choice if you need an excuse to have a cup of coffee after every command you type.
+#
+# This is how it'll look:
+# https://raw.githubusercontent.com/romkatv/dotfiles-public/master/dotfiles/purepower.png.
+#
+# Pure Power needs to be installed in addition to Powerlevel10k, not instead of it. Pure Power
+# defines a set of configuration parameters that affect the styling of Powerlevel10k; there is no
+# code in it.
+#
+#                         PHILOSOPHY
+#
+# This configuration is made for those who care about style and value clear UI without redundancy
+# and tacky ornaments that serve no function.
+#
+#   * No overwhelming background that steals attention from real content on your screen.
+#   * No redundant icons. A clock icon next to the current time takes space without conveying any
+#     information. This is your personal prompt -- you don't need an icon to remind you that the
+#     segment on the right shows current time.
+#   * No separators between prompt segments. Different foreground colors are enough to keep them
+#     visually distinct.
+#   * Bright colors for important things, low-contrast colors for everything else.
+#   * No needless color switching. The number of stashes you have in a git repository is always
+#     green. Since its meaning is the same in a clean and in a dirty repository, it doesn't change
+#     color.
+#
+#                         LEFT PROMPT
+#
+#   * Your current directory is bright blue when under $HOME and brownish everywhere else.
+#   * A lock icon is shown on the far left if you cannot write to the current directory.
+#   * The prompt symbol on the left is '❮' when vicmd keymap is active and '❯' otherwise. It's green
+#     if the last command has succeeded and red if it has failed.
+#   * Git prompt colors:
+#     * Grey: prompt is refreshing in the background (happens only in large repositories).
+#     * Green: clean (no stated or unstaged changes and no untracked files).
+#     * Yellow: dirty (some stated or unstaged changes).
+#     * Teal: some untracked files but otherwise clean (no staged or unstaged changes).
+#   * Git prompt icons:
+#     * '@12345678' (git prompt color): detached HEAD at commit 12345678.
+#     * 'my-feature' (git prompt color): on branch my-feature.
+#     * 'my-feature|master' (git prompt color): on branch my-feature tracking remote branch master.
+#     * '#my-release' (git prompt color): on tag my-release.
+#     * '+' (yellow): staged changes.
+#     * '!' (yellow): unstaged changes.
+#     * '?' (teal): untracked files.
+#     * '⇡42' (green): 42 commits ahead of remote.
+#     * '⇣42' (green): 42 commits behind remote.
+#     * '*42' (green): 42 stashes.
+#
+#                        RIGHT PROMPT
+#
+#   * Current time on the far right.
+#   * Last command execution time (in seconds).
+#   * Error code with an optional signal name of the last command if it failed, in red.
+#   * A gear icon if you have background jobs.
+#   * An unlocked lock icon if you are root.
+#   * If you type `custom_rprompt() { echo 'message' }`, you'll get 'message' shown on the right.
+#     Useful to integrate with your scripts that change some sort of state/environment.
+#
+#                       INSTALLATION
+#
+# 1. Copy this file to your home directory.
+#
+#    ( cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower )
+#
+# 2. Source the file from ~/.zshrc.
+#
+#    echo 'source ~/.purepower' >>! ~/.zshrc
+#
+# 3. Enable Powerlevel10k ZSH theme. The easiest way is this:
+#
+#    git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+#    echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+#
+# If you are using a plugin manager, see https://github.com/romkatv/powerlevel10k for installation
+# options.
+#
+#                       CONFIGURATION
+#
+# You can set PURE_POWER_MODE before sourcing ~/.purepower to restrict the range of characters it
+# uses.
+#
+#   * PURE_POWER_MODE=fancy     use unicode characters in the prompt (default)
+#   * PURE_POWER_MODE=portable  use only ascii characters in the prompt
+#
+# You can switch mode on the fly by setting PURE_POWER_MODE and executing zsh. Useful when you end
+# up in an environment without a capable font and see gibberish on your screen.
+#
+#   PURE_POWER_MODE=portable exec zsh  # switch to portable mode
+#   PURE_POWER_MODE=fancy    exec zsh  # switch to fancy mode
+#
+# To configure what gets shown in the prompt, edit ~/.purepower. See
+# https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation-and-configuration for
+# configuration options. Prompt configuration is a deeply personal affair, so take your time to
+# craft the right prompt just for you. The stock configuration is merely a starting point, a source
+# of inspiration, a frame for your own creation. Mercilessly slash everything of little value to
+# you. Don't care how long commands take to execute? Get rid of command_execution_time segment!
+# Boldly mold prompt pieces useful to you to ensure a perfect fit to your workflow and aesthetic
+# preferences. Take full advantage of powerlevel over 9k!
+#
+# Remember that colors looks differently in different terminals. Use this script to choose what
+# works best for you.
+#
+#   for ((i = 0; i != 256; ++i)); do print -P "%F{${(l:3::0:)i}}${(l:3::0:)i} TEST%f"; done
+#
+# Keep in mind that some prompt segments can appear and disappear depending on the state of your
+# environment. Make sure colors work well in every situation. Neighboring segments should always
+# have distinct colors.
+#
+# If you are using Pure Power with Powerlevel9k rather than Powerlevel10k, you'll need to set
+# PURE_POWER_USE_P10K_EXTENSIONS=0 before sourcing ~/.purepower or you'll see gibberish in your left
+# prompt. This option will turn off vi keymap integration, so your prompt symbol will always be '❯'.
+# Your prompt will also be 10-100 times slower with Powerlevel9k. This is not the fault of Pure
+# Power. Powerlevel9k is slow with any styling.
+#
+#                       ATTRIBUTION
+#
+# Visual design of this configuration borrows heavily from https://github.com/sindresorhus/pure.
+# Recretion of Pure look and feel in Powerlevel10k was inspired by
+# https://github.com/iboyperson/p9k-theme-pastel.
 
-function git_toplevel {
-  x=`git rev-parse --show-toplevel 2> /dev/null`
-  if [[ -n $x ]]; then
-    echo `basename $x`
+if test -z "${ZSH_VERSION}"; then
+  echo "purepower: unsupported shell; try zsh instead" >&2
+  return 1
+  exit 1
+fi
+
+() {
+  emulate -L zsh && setopt no_unset pipe_fail
+
+  if (( ARGC )); then
+    echo -E "Usage: source ~/.purepower" >&2
+    return 1
   fi
-}
 
-function compact_host {
-  h=`hostname -s`
-  if [[ $h == "shiva" ]]; then
-    h=""
-  elif [[ $h == "web317" ]]; then
-    h="wf "
-  elif [[ $h == "virabhadra" ]]; then
-    # h="%{$clr_venv%}v%{$reset_color%} "
-    h="v "
-  elif [[ $h == "VTUMUKEDP017" ]]; then
-    # h="%{$clr_venv%}v%{$reset_color%} "
-    h="vd "
+  local mode=${PURE_POWER_MODE:-fancy}
+  case $mode in
+    fancy)
+      local vi_insert=$'\u276F'
+      local vi_cmd=$'\u276E'
+      local lock=$'\uF023'
+      local incoming=$'\u21E3'
+      local outgoing=$'\u21E1'
+      local root=$'\uF09C'
+      local jobs=$'\uF013'
+      ;;
+    *)
+      if [[ $mode != portable ]]; then
+        echo -En "purepower: invalid mode: ${(qq)mode}; " >&2
+        echo -E  "valid options are 'fancy' and 'portable'; falling back to 'portable'" >&2
+      fi
+      local vi_insert='>'
+      local vi_cmd='<'
+      local lock='X'
+      local incoming='<'
+      local outgoing='>'
+      local root='#'
+      local jobs='%%'
+      ;;
+  esac
+
+  typeset -ga POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+      dir_writable dir vcs)
+
+  typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+      status command_execution_time root_indicator background_jobs custom_rprompt time)
+
+  if (( ${PURE_POWER_USE_P10K_EXTENSIONS:-1} )); then
+    local p="\${\${\${KEYMAP:-0}:#vicmd}:+${${vi_insert//\\/\\\\}//\}/\\\}}}"
+    p+="\${\${\$((!\${#\${KEYMAP:-0}:#vicmd})):#0}:+${${vi_cmd//\\/\\\\}//\}/\\\}}}"
   else
-    h="$h "
+    p=$vi_insert
   fi
-  echo "%{$clr_host%}$h%{$reset_color%}"
-}
 
-# Second line only appears if we're in a virtualenv or a git repository.
-function extraLine {
-  gitInfo=$(git_prompt_info)
-  if [[ -n $gitInfo || -n $VIRTUAL_ENV ]]; then
-    echo "
-│ %{$clr_venv%}$(virtualenv_info)%{$reset_color%}%{$clr_git_toplevel%}$(git_toplevel)%{$reset_color%}$gitInfo"
-  else
-    echo -n ""
-  fi
-}
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%(?.%F{002}${p}%f.%F{009}${p}%f) "
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=$'\n'
+  typeset -g POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+  typeset -g POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
 
-# # Second line only appears if we're in a virtualenv or a git repository.
-# function extraLine {
-#   gitInfo=$(git_prompt_info)
-#   hgInfo=$(hg_prompt_info)
-#   if [[ -n $gitInfo || -n $hgInfo || -n $VIRTUAL_ENV ]]; then
-#     echo "
-# │ %{$clr_venv%}$(virtualenv_info)%{$reset_color%}%{$clr_git_toplevel%}$(git_toplevel)%{$reset_color%}$gitInfo$hgInfo"
-#   else
-#     echo -n ""
-#   fi
-# }
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '
+  typeset -g POWERLEVEL9K_WHITESPACE_BETWEEN_{LEFT,RIGHT}_SEGMENTS=
 
-PROMPT="
-╭─${history_line} ${time} ${user_host}:${current_dir} ${return_code}\$(extraLine)
-%{$clr_compact_host%}$(compact_host)%{$clr_prompt%}%B$%b%{$reset_color%} "
+  typeset -g POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_BACKGROUND=none
+  typeset -g POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_VISUAL_IDENTIFIER_COLOR=003
+  typeset -g POWERLEVEL9K_LOCK_ICON=$lock
 
-RPS1=""
+  typeset -g POWERLEVEL9K_DIR_{ETC,HOME,HOME_SUBFOLDER,DEFAULT}_BACKGROUND=none
+  typeset -g POWERLEVEL9K_DIR_{ETC,DEFAULT}_FOREGROUND=209
+  typeset -g POWERLEVEL9K_DIR_{HOME,HOME_SUBFOLDER}_FOREGROUND=039
+  typeset -g POWERLEVEL9K_{ETC,FOLDER,HOME,HOME_SUB}_ICON=
 
-ZSH_THEME_GIT_PROMPT_PREFIX="%{$clr_git_bg%}±(%{$clr_git_branch%}"
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_DIRTY="%{$reset_color%}%{$clr_git_bg%}) %{$clr_git_dirty%}✗"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$reset_color%}%{$clr_git_bg%})"
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED,LOADING}_BACKGROUND=none
+  typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=076
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=014
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=011
+  typeset -g POWERLEVEL9K_VCS_LOADING_FOREGROUND=244
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_UNTRACKEDFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_UNSTAGEDFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_MODIFIED_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_STAGEDFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_MODIFIED_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_INCOMING_CHANGESFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_CLEAN_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_OUTGOING_CHANGESFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_CLEAN_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_STASHFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_CLEAN_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_ACTIONFORMAT_FOREGROUND=001
+  typeset -g POWERLEVEL9K_VCS_LOADING_ACTIONFORMAT_FOREGROUND=$POWERLEVEL9K_VCS_LOADING_FOREGROUND
+  typeset -g POWERLEVEL9K_VCS_{GIT,GIT_GITHUB,GIT_BITBUCKET,GIT_GITLAB,BRANCH}_ICON=
+  typeset -g POWERLEVEL9K_VCS_REMOTE_BRANCH_ICON=$'\b|'
+  typeset -g POWERLEVEL9K_VCS_COMMIT_ICON='@'
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON=$'\b?'
+  typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON=$'\b!'
+  typeset -g POWERLEVEL9K_VCS_STAGED_ICON=$'\b+'
+  typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON=$incoming
+  typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON=$outgoing
+  typeset -g POWERLEVEL9K_VCS_STASH_ICON='*'
+  typeset -g POWERLEVEL9K_VCS_TAG_ICON=$'\b#'
+
+  typeset -g POWERLEVEL9K_ROOT_INDICATOR_BACKGROUND=none
+  typeset -g POWERLEVEL9K_ROOT_ICON=$root
+
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=none
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR=002
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_ICON=$jobs
+
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=0
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND=none
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=101
+  typeset -g POWERLEVEL9K_EXECUTION_TIME_ICON=
+
+  typeset -g POWERLEVEL9K_TIME_BACKGROUND=none
+  typeset -g POWERLEVEL9K_TIME_FOREGROUND=244
+  typeset -g POWERLEVEL9K_TIME_ICON=
+
+  typeset -g POWERLEVEL9K_STATUS_OK=false
+  typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND=none
+  typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=009
+  typeset -g POWERLEVEL9K_CARRIAGE_RETURN_ICON=
+
+  typeset -g POWERLEVEL9K_CUSTOM_RPROMPT=custom_rprompt
+  typeset -g POWERLEVEL9K_CUSTOM_RPROMPT_BACKGROUND=none
+  typeset -g POWERLEVEL9K_CUSTOM_RPROMPT_FOREGROUND=012
+
+  function custom_rprompt() {}  # redefine this to show stuff in custom_rprompt segment
+
+
+
+  # GIMBO
+
+  # TODO:
+  # * Remove space between vcs_root and vcs; vcs_joined seems to fail
+  #   Github issue: https://github.com/romkatv/powerlevel10k/issues/41
+  # * Prefix $ on final line with hostname
+
+  function get_vcs_root() {
+      # Could maybe speed this up (particularly as it's called twice)
+      # by using the gitstatus daemon thing like the vcs element
+      # does. It's probably not worth the bother though.
+      #
+      # If interested, see: https://github.com/romkatv/gitstatus
+      local root
+      local x=$(git rev-parse --show-toplevel 2> /dev/null)
+      if [[ -n $x ]]; then
+          root=$(basename $x)
+          echo "$root"
+      fi
+  }
+
+  function maybe_newline() {
+      if [[ -n "$VIRTUAL_ENV" || -n $(get_vcs_root) ]]; then
+          # The extra characters seems needed here - a plain newline
+          # gets stripped for some reason. Got these codes, which seem
+          # to move the cursor forwards and back, from
+          # https://github.com/bhilburn/powerlevel9k/issues/169#issuecomment-167771019
+          echo "\n│\e[1C\e[1D"
+      fi
+  }
+  typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE="maybe_newline"
+
+  function vcs_root() {
+      local root=$(get_vcs_root)
+      if [[ -n $root ]]; then
+          echo "$root±"
+      fi
+  }
+  typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT="vcs_root"
+
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=' '
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '
+
+  typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="╭─"
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX="│ "
+
+  typeset -ga POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+      history
+      time
+      context
+      dir_writable dir
+      status
+      pyenv
+      custom_maybe_newline
+      virtualenv
+      custom_vcs_root vcs
+  )
+
+  # First line
+  typeset -g POWERLEVEL9K_HISTORY_BACKGROUND=none
+  typeset -g POWERLEVEL9K_HISTORY_FOREGROUND=none
+  typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
+  typeset -g POWERLEVEL9K_CONTEXT_DEFAULT_BACKGROUND=none
+  typeset -g POWERLEVEL9K_CONTEXT_DEFAULT_FOREGROUND=none
+  typeset -g POWERLEVEL9K_DIR_HOME_FOREGROUND=229
+  typeset -g POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND=229
+  typeset -g POWERLEVEL9K_DIR_ETC_FOREGROUND=196
+  typeset -g POWERLEVEL9K_PYTHON_ICON=''
+  typeset -g POWERLEVEL9K_PYENV_BACKGROUND=none
+  typeset -g POWERLEVEL9K_PYENV_FOREGROUND=005
+
+  # Second line
+  typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE_BACKGROUND=none
+  typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE_FOREGROUND=none
+  typeset -g POWERLEVEL9K_VIRTUALENV_BACKGROUND=none
+  typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=015
+  typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_BACKGROUND=008
+  typeset -g POWERLEVEL9K_CUSTOM_VCS_ROOT_FOREGROUND=245
+  # typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=156
+  # typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=195
+  # typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=001
+  # typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=none
+  # typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=none
+  # typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=none
+
+  # Unlike in gimbo.zsh-theme, no hostname on this line any more
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
+
+  # Right hand side
+  typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+      command_execution_time root_indicator background_jobs)
+
+
+
+} "$@"
