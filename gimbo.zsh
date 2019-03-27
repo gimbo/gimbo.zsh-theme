@@ -360,7 +360,10 @@ fi
       custom_vcs_root vcs_joined
   )
   typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
-      command_execution_time root_indicator background_jobs)
+      command_execution_time
+      root_indicator
+      background_jobs
+  )
 
   # Config for first line elements
   #
