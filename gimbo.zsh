@@ -261,15 +261,6 @@ fi
 
   # GIMBO
 
-  # TODO:
-  #
-  # * Remove space between vcs_root and vcs; specifying a segment
-  #   called vcs_joined should apparently work but seems to fail - for
-  #   which I've opened a github issue:
-  #   https://github.com/romkatv/powerlevel10k/issues/41
-
-
-
   # Helpers
 
   function get_vcs_root() {
@@ -328,7 +319,7 @@ fi
       pyenv
       custom_maybe_newline
       virtualenv
-      custom_vcs_root vcs
+      custom_vcs_root vcs_joined
   )
   typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
       command_execution_time root_indicator background_jobs)
