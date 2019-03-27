@@ -310,7 +310,7 @@ fi
       local root
       local x=$(git rev-parse --show-toplevel 2> /dev/null)
       if [[ -n $x ]]; then
-          root=$(basename $x)
+          root=${x:t}
           echo "$root"
       fi
   }
