@@ -1,11 +1,49 @@
 # Andy Gimblett's zsh prompt/theme.
 #
-# This is a modification/extension of purepower - see below.
+# This is a modification/extension of the purepower config for the
+# powerlevel10k theme; everything in this file between this comment
+# block and the word GIMBO is just the default purepower config. My
+# modifications are after that (i.e. after the GIMBO comment).
 #
-# See the "GIMBO" section for customisations; the rest of this file
-# (other than this header) should just be the default purepower
-# config.
-
+# It's fairly minimal in terms of eye candy, focusing on showing the
+# interesting data, with a smattering of colour to highlight important
+# parts.
+#
+# Example of how this theme looks (colours not shown):
+#
+# ╭─10015 11:53:56 gimbo@shaman ~/prog/gimbo/zsh-plugins/gimbo.zsh-theme
+# │ gimbo.zsh-theme±master                                             5.59
+# $
+#
+# We have:
+#
+# * First line:
+#   - History number
+#   - Time
+#   - Context (i.e. username/hostname)
+#   - Directory writable status (not shown above)
+#   - Directory - in full
+#   - Status of last command if it failed (not shown above)
+#   - pyenv in use if not standard (not shown above)
+#
+# * Second line - only shown if either of the following are present:
+#  - Python virtualenv name (not shown above)
+#  - Git info, consisting of:
+#    + Repo name (i.e. name of folder containing .git folder)
+#    + (A fixed ± separator)
+#    + Branch name
+#    + Dirtiness indicators (not shown above)
+#
+# * Right hand side:
+#  - Command execution time
+#  - Indicator if user is root (not shown above)
+#  - Background jobs indicator (not shown above)
+#
+# * Actual prompt line:
+#  - Just a $ except if in vicmd mode (then it's a <)
+#  - Green if last command succeeded; red otherwise.
+#
+# End of introduction; everything between here and the word GIMBO is standard purepower.
 
 
 # Original location: https://github.com/romkatv/dotfiles-public/blob/master/.purepower.
@@ -285,9 +323,9 @@ fi
   #
   function maybe_newline() {
       if [[ -n "$VIRTUAL_ENV" || -n $(get_vcs_root) ]]; then
-          # The extra characters seems needed here - a plain newline
-          # gets stripped for some reason. Got these codes, which seem
-          # to move the cursor forwards and back, from
+          # The extra characters seem to be needed here - a plain
+          # newline gets stripped for some reason. I got these codes,
+          # which seem to move the cursor forwards and back, from
           # https://github.com/bhilburn/powerlevel9k/issues/169#issuecomment-167771019
           echo "\n│\e[1C\e[1D"
       fi
