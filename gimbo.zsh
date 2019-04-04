@@ -1,5 +1,7 @@
 # Andy Gimblett's zsh prompt/theme.
 #
+# https://github.com/gimbo/gimbo.zsh-theme
+#
 # This is a modification/extension of the purepower config for the
 # powerlevel10k theme; everything in this file between this comment
 # block and the word GIMBO is just the default purepower config. My
@@ -9,7 +11,8 @@
 # interesting data, with a smattering of colour to highlight important
 # parts.
 #
-# Example of how this theme looks (colours not shown):
+# Here's an example of how this theme looks; see the git repo for see
+# more examples, with colours and annotation.
 #
 # ╭─10015 11:53:56 gimbo@shaman ~/prog/gimbo/zsh-plugins/gimbo.zsh-theme
 # │ gimbo.zsh-theme±master                                             5.59
