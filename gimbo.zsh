@@ -326,11 +326,7 @@ fi
   #
   function maybe_newline() {
       if [[ -n "$VIRTUAL_ENV" || -n $(get_vcs_root) ]]; then
-          # The extra characters seem to be needed here - a plain
-          # newline gets stripped for some reason. I got these codes,
-          # which seem to move the cursor forwards and back, from
-          # https://github.com/bhilburn/powerlevel9k/issues/169#issuecomment-167771019
-          echo "\n│\e[1C\e[1D"
+          echo "\n│"
       fi
   }
   typeset -g POWERLEVEL9K_CUSTOM_MAYBE_NEWLINE="maybe_newline"
