@@ -2,10 +2,17 @@
 #
 # https://github.com/gimbo/gimbo.zsh-theme
 #
+# Andy Gimblett's zsh prompt/theme.
+#
+# https://github.com/gimbo/gimbo.zsh-theme
+#
 # This is a modification/extension of the purepower config for the
-# powerlevel10k theme; everything in this file between this comment
-# block and the word GIMBO is just the default purepower config. My
-# modifications are after that (i.e. after the GIMBO comment).
+# powerlevel10k theme; with one exception (see below), everything in this file
+# between this comment block and the word GIMBO is just the default purepower
+# config. My modifications are after that (i.e. after the GIMBO comment).
+#
+# (The exception: There's a commented-out block, headed with the word
+# GIMBO_EXCEPTION )
 #
 # It's fairly minimal in terms of eye candy, focusing on showing the
 # interesting data, with a smattering of colour to highlight important
@@ -184,10 +191,22 @@ fi
 () {
   emulate -L zsh && setopt no_unset pipe_fail
 
-  if (( ARGC )); then
-    echo -E "Usage: source ~/.purepower" >&2
-    return 1
-  fi
+  # GIMBO_EXCEPTION
+  #
+  # This is the one part of the main purepower code (i.e. before the word GIMBO
+  # below) that we've changed.
+  #
+  # We've commented this out because when zgen resets `init.zsh`, this was
+  # annoyingly getting triggered (it seems it would pass the plugin name
+  # through). There seems to be no ill effect from commenting it out;
+  # presumably this problem is arising due to e.g. zgen evolving while this
+  # gimbo-theme plugin remained static. Future work is to update this
+  # gimbo-theme plugin to match a more current version of purepower. :-)
+  #
+  # if (( ARGC )); then
+  #   echo -E "Usage: source ~/.purepower" >&2
+  #   return 1
+  # fi
 
   local mode=${PURE_POWER_MODE:-fancy}
   case $mode in
